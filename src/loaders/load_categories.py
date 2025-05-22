@@ -16,7 +16,7 @@ def load_categories_from_csv(filepath: str) -> list[Category]:
     return categories
 
 if __name__ == "__main__":
-    ruta = "data/categories.csv"  # Ruta relativa desde la raíz del proyecto
+    ruta = "data/categories.csv"
     categorias = load_categories_from_csv(ruta)
     for c in categorias:
         print(c)
