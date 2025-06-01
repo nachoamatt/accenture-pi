@@ -1,4 +1,4 @@
-from db.connector import DatabaseConnector
+from src.db.connector import DatabaseConnector
 
 def test_connection():
     try:

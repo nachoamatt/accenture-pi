@@ -1,6 +1,7 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 from dotenv import load_dotenv
+import pandas as pd
 import os
 
 class DatabaseConnector:
@@ -22,7 +23,6 @@ class DatabaseConnector:
         port = os.getenv("DB_PORT", "3306")
         database = os.getenv("DB_NAME")
 
-        # Solo se requiere que user y database no estén vacíos
         if not all([user, database]):
             raise ValueError("Faltan variables necesarias en el archivo .env")
 
@@ -32,3 +32,10 @@ class DatabaseConnector:
     @property
     def engine(self) -> Engine:
         return self._engine
+
+    def execute_query(self, sql: str) -> pd.DataFrame:
+        """Ejecuta una consulta SQL y devuelve los resultados en un DataFrame de pandas."""
+        with self._engine.connect() as connection:
+            result = connection.execute(text(sql))
+            df = pd.DataFrame(result.fetchall(), columns=result.keys())
+        return df

@@ -1,5 +1,3 @@
-# src/models/product.py
-
 from src.models.category import Category
 
 class Product:
