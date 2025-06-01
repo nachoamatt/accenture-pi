@@ -5,16 +5,27 @@ Fue desarrollado como parte del curso de Data Engineering, aplicando principios 
 
 ## 📁 Estructura del Proyecto
 
-- `data/`: archivos `.csv` originales con los datos del negocio  
-- `sql/`: scripts SQL para creación de tablas y carga de datos  
-- `src/`: código fuente en Python, organizado en:
-  - `models/`: clases que representan las entidades del sistema (POO)
-  - `loaders/`: scripts para leer archivos CSV y mapearlos a objetos Python
-  - `db/`: clase de conexión a base de datos usando SQLAlchemy
-- `tests/`: pruebas unitarias con `pytest`  
-- `.env`: variables de entorno (credenciales y parámetros de conexión)  
-- `.gitignore`: exclusión de archivos innecesarios en el control de versiones  
-- `requirements.txt`: dependencias del proyecto  
+- `data/`:  
+  Archivos `.csv` originales con los datos del negocio (countries, cities, customers, employees, categories, products, sales).  
+
+- `sql/`:  
+  Scripts SQL para:  
+  - Creación de las tablas (`schema.sql`)  
+  - Carga inicial de datos mediante comandos `LOAD DATA` (`load_data.sql`, aunque no se usa directamente en el código Python)  
+
+- `src/`: Código fuente en Python, organizado en subcarpetas:  
+  - `models/`: Clases que representan las entidades del sistema siguiendo POO.  
+  - `loaders/`: Funciones para leer archivos CSV y mapearlos a objetos Python.  
+  - `db/`: Clase de conexión a la base de datos usando SQLAlchemy, implementada con patrón Singleton para manejo eficiente.  
+  - `ingestion/`: Scripts para insertar los datos en la base de datos, usando los loaders y el conector.  
+  - `factories/`: Implementación del patrón Factory para creación de objetos modelo.  
+
+- `tests/`: Pruebas unitarias con `pytest` que verifican funcionalidades de los modelos, loaders, y la conexión a la base de datos.  
+
+- `.gitignore`: Archivo para excluir archivos y carpetas no deseados en el control de versiones (por ejemplo, `venv/`, `.env`).  
+
+- `requirements.txt`: Archivo con las dependencias necesarias para ejecutar el proyecto (`sqlalchemy`, `pandas`, `python-dotenv`, `pytest`, etc.).  
+
 
 ## ⚙️ Configuración del entorno
 
@@ -49,48 +60,57 @@ mysql -u root supermercado < sql/schema.sql
 
 ### Carga de datos
 
-Asegurarse de tener habilitado `local_infile` y luego ejecutar:
+La carga de datos se realiza mediante scripts Python ubicados en `src/ingestion/` que procesan y validan la información antes de insertarla en la base.
+
+Estos scripts:
+
+- Usan los loaders para leer los archivos CSV y crear objetos Python.
+- Gestionan correctamente las relaciones entre entidades (por ejemplo, asignar la ciudad correcta a un cliente).
+- Insertan los datos en la base usando SQLAlchemy para garantizar integridad y manejo eficiente.
+
+#### Ejecución del script general de carga
+
+Para automatizar la inserción de todos los datos en orden, se creó el script `run_all_inserts.py` en la carpeta `src/ingestion/`.
+
+Ejecutar el script con:
 
 ```bash
-mysql --local-infile=1 -u root supermercado < sql/load_data.sql
+python -m src.ingestion.run_all_inserts
 ```
+
+El script realiza la carga secuencial de todas las entidades (countries, cities, customers, employees, categories, products y sales), mostrando en consola el estado de cada inserción y posibles errores.
+
 
 ## 🐍 Modelado en Python (POO)
 
-Se crearon clases como `Category`, `Product`, `Customer`, `Employee`, etc., siguiendo los principios de programación orientada a objetos:
+Se crearon clases que representan las entidades del negocio, siguiendo principios de Programación Orientada a Objetos:
 
-- Encapsulamiento  
-- Uso de constructores  
-- Métodos específicos del dominio (como `.apply_discount()` en `Product`)  
-- Relaciones entre objetos (por ejemplo, un `Product` contiene una `Category` como atributo)
+- **Encapsulamiento:** atributos privados y acceso controlado mediante métodos o propiedades.
+- **Constructores:** para inicializar objetos con datos relevantes.
+- **Métodos específicos:** como `apply_discount()` en `Product` o `full_name()` en `Customer`.
+- **Relaciones:** objetos anidados, por ejemplo, un `Product` contiene una `Category`.
+
+Esto facilita mantener el código limpio, escalable y con una representación fiel del dominio del problema.
 
 ## 📥 Lectura de CSV y mapeo a objetos
 
-Se implementaron loaders que:
+Los loaders:
 
-- Leen los archivos `.csv` con `csv.DictReader`  
-- Instancian objetos Python de cada clase  
-- Asocian correctamente entidades (por ejemplo, `Product` ↔ `Category`)  
-
-### Ejemplo de uso
-
-```bash
-PYTHONPATH=. python3 src/loaders/load_products.py
-```
+- Usan `csv.DictReader` para leer archivos CSV.
+- Crean instancias de las clases modelo con los datos leídos.
+- Gestionan correctamente las relaciones entre entidades (por ejemplo, asignan la `Category` correcta a un `Product`).
+- Permiten pruebas y manipulación previa a la inserción en base.
 
 ## 🔌 Conexión a la Base de Datos con SQLAlchemy
 
-Se creó una clase `DatabaseConnector` en `src/db/connector.py`, que utiliza **SQLAlchemy** para establecer una conexión eficiente a la base de datos MySQL.
+Se diseñó una clase `DatabaseConnector`:
 
-### Uso del patrón Singleton
+- Implementa el **patrón Singleton** para mantener una única conexión activa.
+- Usa `SQLAlchemy` para la conexión y ejecución eficiente de queries.
+- Carga las credenciales desde un archivo `.env` mediante `python-dotenv`.
+- Expone un método para ejecutar consultas y devolver resultados en formato `pandas.DataFrame`.
 
-La clase aplica el **patrón de diseño Singleton** para asegurar que toda la aplicación comparta la misma conexión.
-
-#### Justificación
-
-- **Eficiencia de recursos**: evita múltiples conexiones redundantes  
-- **Consistencia**: asegura que todas las operaciones usen la misma instancia de engine  
-- **Mantenimiento**: centraliza y simplifica la lógica de conexión  
+Esto permite centralizar la conexión y facilitar la integración con análisis y tests.
 
 ### Variables de entorno (.env)
 
@@ -99,40 +119,43 @@ Las credenciales de la base se definen en el archivo `.env` y se cargan automát
 Ejemplo:
 
 ```
-DB_USER=root
-DB_PASSWORD=
+DB_USER=xxxx
+DB_PASSWORD=xxxx
 DB_HOST=localhost
-DB_PORT=3306
+DB_PORT=xxxx
 DB_NAME=supermercado
 ```
 
 ## 📊 Consultas desde Python
 
-La clase `DatabaseConnector` expone una propiedad `.engine` para ejecutar queries con SQLAlchemy o pandas.  
-(Más detalles en el notebook del avance 3.)
+La clase `DatabaseConnector` incluye un método para ejecutar consultas SQL simples:
+
+- Recibe una consulta SQL como string.
+- Ejecuta la consulta usando la conexión activa.
+- Devuelve los resultados como un DataFrame de pandas, facilitando el análisis y manipulación de datos.
+
+Este enfoque permite integrar el acceso a la base de datos con las herramientas de análisis propias de Python, como pandas.
 
 ## 🧪 Pruebas unitarias
 
-Se agregó un test de conexión en `tests/test_connection.py` que verifica si la instancia Singleton conecta correctamente a la base.
+- Se implementaron pruebas unitarias con `pytest` para validar funcionalidades críticas.
+- Por ejemplo, existe un test para verificar la correcta creación de instancias de modelos.
+- Otro test asegura que la conexión a la base de datos funcione y se mantenga única (Singleton).
+- Se prueba la correcta ejecución de queries y retorno de datos.
 
-Ejecución:
-
-```bash
-PYTHONPATH=src python3 tests/test_connection.py
-```
-
-## ✅ Testing (Avance 1)
-
-Se utilizan pruebas unitarias con `pytest`, cubriendo al menos una clase del modelo.  
-(Ver `tests/test_product.py` próximamente)
+Las pruebas automatizadas facilitan mantener la calidad del código y evitar regresiones.
 
 ## 🧠 Justificación técnica
 
-Este enfoque modular permite:
+El diseño modular y orientado a objetos aplicado en este proyecto ofrece varias ventajas clave:
 
-- **Escalabilidad**: se pueden agregar nuevas entidades o fuentes de datos fácilmente  
-- **Reutilización**: las clases del modelo pueden conectarse a una DB o usarse en análisis en memoria  
-- **Mantenibilidad**: el código está limpio y desacoplado, lo que facilita futuras mejoras
+- **Escalabilidad**: Es sencillo agregar nuevas entidades, loaders o funcionalidades sin afectar el núcleo del sistema.
+- **Reutilización**: Las clases modelo pueden usarse tanto para manipulación en memoria como para persistencia en base de datos.
+- **Mantenibilidad**: La separación clara de responsabilidades permite detectar y corregir errores de forma ágil.
+- **Eficiencia**: El patrón Singleton en la conexión evita overheads por múltiples conexiones simultáneas.
+- **Flexibilidad**: La integración de loaders que generan objetos facilita el trabajo con diferentes fuentes de datos.
+
+Este enfoque prepara la base para futuros desarrollos de análisis avanzados y pipelines de datos robustos.
 
 ## 👨‍💻 Autor
 
