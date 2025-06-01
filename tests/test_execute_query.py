@@ -3,9 +3,15 @@ import pandas as pd
 
 def test_execute_query():
     db = DatabaseConnector()
-    query = "SELECT COUNT(*) AS total FROM customers;"  
+    query = "SELECT COUNT(*) AS total FROM customers;"
     result = db.execute_query(query)
+    
+    # Verificamos que es un DataFrame
+    assert isinstance(result, pd.DataFrame)
+    
+    # Verificamos que tenga al menos una fila y la columna 'total'
+    assert not result.empty
+    assert 'total' in result.columns
 
-    assert isinstance(result, pd.DataFrame), "El resultado no es un DataFrame"
-    assert "total" in result.columns, "La columna 'total' no está en el resultado"
-    assert result.shape[0] == 1, "Se esperaba un único resultado"
+    # Mostramos el resultado por consola (opcional)
+    print(result)

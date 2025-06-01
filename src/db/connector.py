@@ -39,3 +39,13 @@ class DatabaseConnector:
             result = connection.execute(text(sql))
             df = pd.DataFrame(result.fetchall(), columns=result.keys())
         return df
+
+    def test_connection(self) -> bool:
+        """Intenta ejecutar una consulta de prueba para validar la conexión."""
+        try:
+            with self._engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+            return True
+        except Exception as e:
+            print(f"❌ Error al probar la conexión: {e}")
+            return False
