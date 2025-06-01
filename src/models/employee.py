@@ -1,5 +1,3 @@
-# src/models/employee.py
-
 from src.models.city import City
 
 class Employee:

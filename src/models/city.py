@@ -1,5 +1,3 @@
-# src/models/city.py
-
 from src.models.country import Country
 
 class City:

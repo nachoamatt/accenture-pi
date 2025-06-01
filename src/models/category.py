@@ -1,5 +1,3 @@
-# src/models/category.py
-
 class Category:
     def __init__(self, category_id: int, name: str):
         self._id = category_id

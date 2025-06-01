@@ -1,5 +1,3 @@
-# src/models/sale.py
-
 from src.models.employee import Employee
 from src.models.customer import Customer
 from src.models.product import Product

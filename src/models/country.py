@@ -1,5 +1,3 @@
-# src/models/country.py
-
 class Country:
     def __init__(self, country_id: int, name: str, code: str):
         self._id = country_id

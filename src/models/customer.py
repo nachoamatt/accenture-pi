@@ -1,5 +1,3 @@
-# src/models/customer.py
-
 from src.models.city import City
 
 class Customer:
