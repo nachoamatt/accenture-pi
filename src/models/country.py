@@ -4,5 +4,14 @@ class Country:
         self._name = name
         self._code = code
 
-    def __str__(self):
-        return f"Country({self._id}, '{self._name}', '{self._code}')"
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def code(self):
+        return self._code

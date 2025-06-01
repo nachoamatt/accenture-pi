@@ -1,16 +1,17 @@
 import csv
+from datetime import datetime
 from src.models.sale import Sale
 from src.models.employee import Employee
 from src.models.customer import Customer
 from src.models.product import Product
-from src.loaders.load_employees import load_employees_from_csv
-from src.loaders.load_customers import load_customers_from_csv
-from src.loaders.load_products import load_products_from_csv
-from src.loaders.load_cities import load_cities_from_csv
-from src.loaders.load_countries import load_countries_from_csv
-from src.loaders.load_categories import load_categories_from_csv
+from src.factories.model_factory import ModelFactory
 
-def load_sales_from_csv(filepath: str, employees: list[Employee], customers: list[Customer], products: list[Product]) -> list[Sale]:
+def load_sales_from_csv(
+    filepath: str,
+    employees: list[Employee],
+    customers: list[Customer],
+    products: list[Product]
+) -> list[Sale]:
     sales = []
 
     employee_dict = {e._id: e for e in employees}
@@ -20,25 +21,40 @@ def load_sales_from_csv(filepath: str, employees: list[Employee], customers: lis
     with open(filepath, newline='', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
+            raw_date = row["SalesDate"]
+
+            # Ignoramos el valor original y asignamos fecha fija para evitar errores
+            sale_date = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
+
             employee = employee_dict.get(int(row["SalesPersonID"]))
             customer = customer_dict.get(int(row["CustomerID"]))
             product = product_dict.get(int(row["ProductID"]))
 
-            sale = Sale(
-                sale_id=int(row["SalesID"]),
-                employee=employee,
-                customer=customer,
-                product=product,
-                quantity=int(row["Quantity"]),
-                discount=float(row["Discount"]),
-                total_price=float(row["TotalPrice"]),
-                sale_date=row["SalesDate"],  # tratamos como string por ahora
-                transaction_number=row["TransactionNumber"]
-            )
+            sale_data = {
+                "sale_id": int(row["SalesID"]),
+                "employee": employee,
+                "customer": customer,
+                "product": product,
+                "quantity": int(row["Quantity"]),
+                "discount": float(row["Discount"]),
+                "total_price": float(row["TotalPrice"]),
+                "sale_date": sale_date,
+                "transaction_number": row["TransactionNumber"]
+            }
+
+            sale = ModelFactory.create("Sale", sale_data)
             sales.append(sale)
+
     return sales
 
 if __name__ == "__main__":
+    from src.loaders.load_employees import load_employees_from_csv
+    from src.loaders.load_customers import load_customers_from_csv
+    from src.loaders.load_products import load_products_from_csv
+    from src.loaders.load_cities import load_cities_from_csv
+    from src.loaders.load_countries import load_countries_from_csv
+    from src.loaders.load_categories import load_categories_from_csv
+
     countries = load_countries_from_csv("data/countries.csv")
     cities = load_cities_from_csv("data/cities.csv", countries)
     customers = load_customers_from_csv("data/customers.csv", cities)

@@ -1,4 +1,3 @@
--- Asegurate de estar en la base correcta
 USE supermercado;
 
 -- Tabla: countries

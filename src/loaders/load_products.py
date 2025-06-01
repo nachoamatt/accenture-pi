@@ -1,10 +1,8 @@
-# src/loaders/load_products.py
-
 import csv
 from datetime import datetime
-from src.models.product import Product
 from src.models.category import Category
-from src.loaders.load_categories import load_categories_from_csv
+from src.models.product import Product
+from src.factories.model_factory import ModelFactory
 
 def load_products_from_csv(filepath: str, categories: list[Category]) -> list[Product]:
     products = []
@@ -21,24 +19,27 @@ def load_products_from_csv(filepath: str, categories: list[Category]) -> list[Pr
                 try:
                     modify_date = datetime.strptime(row["ModifyDate"], "%Y-%m-%d")
                 except ValueError:
-                    pass  # Podés loguear el error si querés
+                    pass
 
-            product = Product(
-                product_id=int(row["ProductID"]),
-                name=row["ProductName"],
-                price=float(row["Price"]),
-                category=category,
-                modify_date=modify_date,
-                product_class=row["Class"],
-                resistant=row["Resistant"],
-                is_allergic=row["IsAllergic"],
-                vitality_days=int(row["VitalityDays"])
-            )
+            product_data = {
+                "product_id": int(row["ProductID"]),
+                "name": row["ProductName"],
+                "price": float(row["Price"]),
+                "category": category,
+                "modify_date": modify_date,
+                "product_class": row["Class"],
+                "resistant": row["Resistant"],
+                "is_allergic": row["IsAllergic"],
+                "vitality_days": int(row["VitalityDays"])
+            }
+
+            product = ModelFactory.create("Product", product_data)
             products.append(product)
 
     return products
 
 if __name__ == "__main__":
+    from src.loaders.load_categories import load_categories_from_csv
     categories = load_categories_from_csv("data/categories.csv")
     products = load_products_from_csv("data/products.csv", categories)
     for p in products:

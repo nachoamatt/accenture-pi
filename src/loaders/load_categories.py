@@ -1,6 +1,5 @@
-# src/loaders/load_categories.py
-
 import csv
+from src.factories.model_factory import ModelFactory
 from src.models.category import Category
 
 def load_categories_from_csv(filepath: str) -> list[Category]:
@@ -8,10 +7,10 @@ def load_categories_from_csv(filepath: str) -> list[Category]:
     with open(filepath, newline='', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            category = Category(
-                category_id=int(row["CategoryID"]),
-                name=row["CategoryName"],
-            )
+            category = ModelFactory.create("Category", {
+                "category_id": int(row["CategoryID"]),
+                "name": row["CategoryName"]
+            })
             categories.append(category)
     return categories
 

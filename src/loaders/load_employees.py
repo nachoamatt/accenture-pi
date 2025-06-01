@@ -4,6 +4,7 @@ from src.models.employee import Employee
 from src.models.city import City
 from src.loaders.load_cities import load_cities_from_csv
 from src.loaders.load_countries import load_countries_from_csv
+from src.factories.model_factory import ModelFactory
 
 def load_employees_from_csv(filepath: str, cities: list[City]) -> list[Employee]:
     employees = []
@@ -14,22 +15,23 @@ def load_employees_from_csv(filepath: str, cities: list[City]) -> list[Employee]
         for row in reader:
             city = cities_dict.get(int(row["CityID"]))
 
-            # Parse fechas
             birth_date = datetime.strptime(row["BirthDate"], "%Y-%m-%d %H:%M:%S.%f")
             hire_date = datetime.strptime(row["HireDate"], "%Y-%m-%d %H:%M:%S.%f")
 
+            data = {
+                "employee_id": int(row["EmployeeID"]),
+                "first_name": row["FirstName"],
+                "middle_initial": row["MiddleInitial"],
+                "last_name": row["LastName"],
+                "birth_date": birth_date,
+                "gender": row["Gender"],
+                "hire_date": hire_date,
+                "city": city
+            }
 
-            employee = Employee(
-                employee_id=int(row["EmployeeID"]),
-                first_name=row["FirstName"],
-                middle_initial=row["MiddleInitial"],
-                last_name=row["LastName"],
-                birth_date=birth_date,
-                gender=row["Gender"],
-                hire_date=hire_date,
-                city=city
-            )
+            employee = ModelFactory.create("Employee", data)
             employees.append(employee)
+
     return employees
 
 if __name__ == "__main__":

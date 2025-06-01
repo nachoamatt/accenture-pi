@@ -2,6 +2,7 @@ import csv
 from src.models.city import City
 from src.models.country import Country
 from src.loaders.load_countries import load_countries_from_csv
+from src.factories.model_factory import ModelFactory
 
 def load_cities_from_csv(filepath: str, countries: list[Country]) -> list[City]:
     cities = []
@@ -13,12 +14,12 @@ def load_cities_from_csv(filepath: str, countries: list[Country]) -> list[City]:
             country_id = int(row["CountryID"])
             country = countries_dict.get(country_id)
 
-            city = City(
-                city_id=int(row["CityID"]),
-                name=row["CityName"],
-                zipcode=row["Zipcode"],
-                country=country
-            )
+            city = ModelFactory.create("City", {
+                "city_id": int(row["CityID"]),
+                "name": row["CityName"],
+                "zipcode": row["Zipcode"],
+                "country": country
+            })
             cities.append(city)
     return cities
 

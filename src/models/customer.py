@@ -14,3 +14,27 @@ class Customer:
 
     def __str__(self):
         return f"Customer({self._id}, {self.full_name()})"
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def first_name(self):
+        return self._first_name
+
+    @property
+    def middle_initial(self):
+        return self._middle_initial
+
+    @property
+    def last_name(self):
+        return self._last_name
+
+    @property
+    def address(self):
+        return self._address
+
+    @property
+    def city(self):
+        return self._city

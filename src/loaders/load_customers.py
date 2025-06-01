@@ -3,6 +3,7 @@ from src.models.customer import Customer
 from src.models.city import City
 from src.loaders.load_cities import load_cities_from_csv
 from src.loaders.load_countries import load_countries_from_csv
+from src.factories.model_factory import ModelFactory
 
 def load_customers_from_csv(filepath: str, cities: list[City]) -> list[Customer]:
     customers = []
@@ -14,14 +15,14 @@ def load_customers_from_csv(filepath: str, cities: list[City]) -> list[Customer]
             city_id = int(row["CityID"])
             city = cities_dict.get(city_id)
 
-            customer = Customer(
-                customer_id=int(row["CustomerID"]),
-                first_name=row["FirstName"],
-                middle_initial=row["MiddleInitial"],
-                last_name=row["LastName"],
-                address=row["Address"],
-                city=city
-            )
+            customer = ModelFactory.create("Customer", {
+                "customer_id": int(row["CustomerID"]),
+                "first_name": row["FirstName"],
+                "middle_initial": row["MiddleInitial"],
+                "last_name": row["LastName"],
+                "address": row["Address"],
+                "city": city
+            })
             customers.append(customer)
     return customers
 

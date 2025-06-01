@@ -6,6 +6,14 @@ class Category:
     def __str__(self):
         return f"Category({self._id}, '{self._name}')"
 
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def name(self):
+        return self._name
+
     def get_id(self):
         return self._id
 

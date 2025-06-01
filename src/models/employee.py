@@ -17,3 +17,35 @@ class Employee:
 
     def __str__(self):
         return f"Employee({self._id}, {self.full_name()})"
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def first_name(self):
+        return self._first_name
+
+    @property
+    def middle_initial(self):
+        return self._middle_initial
+
+    @property
+    def last_name(self):
+        return self._last_name
+
+    @property
+    def birth_date(self):
+        return self._birth_date
+
+    @property
+    def gender(self):
+        return self._gender
+
+    @property
+    def hire_date(self):
+        return self._hire_date
+
+    @property
+    def city(self):
+        return self._city
