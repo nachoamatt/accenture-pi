@@ -49,3 +49,9 @@ class DatabaseConnector:
         except Exception as e:
             print(f"❌ Error al probar la conexión: {e}")
             return False
+
+    def execute_statement(self, sql: str):
+        """Ejecuta una sentencia SQL que no devuelve resultados."""
+        with self._engine.begin() as connection: 
+            connection.execute(text(sql))
+
