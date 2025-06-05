@@ -14,7 +14,6 @@ def test_execute_query():
         assert not result.empty
         assert 'total' in result.columns
 
-        print("✅ test_execute_query pasó correctamente.")
     except Exception as e:
         print("❌ test_execute_query falló:")
         print(e)

@@ -25,4 +25,3 @@ def test_product_creation_and_discount():
     # Assert discounted price
     assert round(product.get_price(), 2) == 90.0
 
-    print(f"✅ Precio con descuento aplicado: {product.get_price()}")

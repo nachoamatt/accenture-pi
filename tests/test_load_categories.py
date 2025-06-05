@@ -19,7 +19,6 @@ def test_load_categories_from_csv(monkeypatch):
         assert isinstance(result[0], Category)
         assert result[0].get_name() == "Bebidas"
 
-        print("✅ test_load_categories_from_csv pasó correctamente.")
     except Exception as e:
         print("❌ test_load_categories_from_csv falló:")
         print(e)

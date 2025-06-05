@@ -6,5 +6,3 @@ def test_category_creation():
     assert category.get_id() == 99
     assert category.get_name() == "Snacks"
     assert str(category) == "Category(99, 'Snacks')"
-
-    print("✅ test_category_creation pasó correctamente.")

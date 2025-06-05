@@ -17,7 +17,6 @@ def test_customer_full_name():
 
         assert customer.full_name() == "Juan M. Pérez"
         assert str(customer) == "Customer(1, Juan M. Pérez)"
-        print("✅ test_customer_full_name pasó correctamente.")
     except Exception as e:
         print("❌ test_customer_full_name falló:")
         print(e)

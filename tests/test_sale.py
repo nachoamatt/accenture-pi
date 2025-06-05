@@ -31,4 +31,3 @@ def test_sale_relationships():
     assert sale._product._name == "Agua"
     assert str(sale).startswith("Sale(999")
 
-    print("✅ Relaciones en la venta correctamente establecidas")
